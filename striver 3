@@ -1,0 +1,97 @@
+https://www.geeksforgeeks.org/problems/geek-jump/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=geek-jump
+m1=Alternative: Bottom-Up Dynamic Programming
+class Solution {
+  public:
+    int minimumEnergy(vector<int>& height, int n) {
+        if (n == 1) return 0; // Only one stone, no energy needed
+
+        vector<int> dp(n, 0);
+        dp[0] = 0;  // Base case
+        dp[1] = abs(height[1] - height[0]);
+
+        for (int i = 2; i < n; i++) {
+            int oneStep = dp[i - 1] + abs(height[i] - height[i - 1]);
+            int twoStep = dp[i - 2] + abs(height[i] - height[i - 2]);
+            dp[i] = min(oneStep, twoStep);
+        }
+
+        return dp[n - 1];
+    }
+};
+m2=Space-Optimized Bottom-Up Solution
+class Solution {
+  public:
+    int minimumEnergy(vector<int>& height, int n) {
+        if (n == 1) return 0;
+
+        int prev2 = 0;  // dp[i-2]
+        int prev1 = abs(height[1] - height[0]);  // dp[i-1]
+
+        for (int i = 2; i < n; i++) {
+            int curr = min(
+                prev1 + abs(height[i] - height[i - 1]),
+                prev2 + abs(height[i] - height[i - 2])
+            );
+            prev2 = prev1;
+            prev1 = curr;
+        }
+
+        return prev1;
+    }
+};
+
+m3=top down
+class Solution {
+  public:
+    int minimumEnergy(vector<int>& height, int n) {
+        // Code here
+        vector<int> dp(n, -1); // Memoization array initialized with -1
+        return fibbo(height, n - 1, dp); // Start from the last stone (n-1)
+    }
+
+    int fibbo(vector<int>& height, int n, vector<int>& dp) {
+        if (n == 0) {
+            return 0; // Base case: no energy needed to stay at the first stone
+        }
+        
+        if (dp[n] != -1) {
+            return dp[n]; // Use the precomputed result
+        }
+
+        int left = fibbo(height, n - 1, dp) + abs(height[n] - height[n - 1]); // One-step jump
+        
+        int right = INT_MAX; // Initialize right for safety
+        if (n > 1) {
+            right = fibbo(height, n - 2, dp) + abs(height[n] - height[n - 2]); // Two-step jump
+        }
+
+        dp[n] = min(left, right); // Store the result in dp array
+        return dp[n];
+    }
+};
+m4=space optimised top down
+class Solution {
+  public:
+    int minimumEnergy(vector<int>& height, int n) {
+        // Start the recursion from the last stone
+        return fibbo(height, n - 1);
+    }
+
+    int fibbo(vector<int>& height, int n) {
+        if (n == 0) {
+            return 0; // Base case: no energy needed to stay at the first stone
+        }
+
+        // Energy for a one-step jump
+        int left = fibbo(height, n - 1) + abs(height[n] - height[n - 1]);
+
+        // Energy for a two-step jump (if possible)
+        int right = INT_MAX; // Initialize right with a high value
+        if (n > 1) {
+            right = fibbo(height, n - 2) + abs(height[n] - height[n - 2]);
+        }
+
+        // Return the minimum energy of the two options
+        return min(left, right);
+    }
+};
